@@ -5,10 +5,12 @@ FROM pytorch/pytorch:2.10.0-cuda12.8-cudnn9-runtime
 ENV DEBIAN_FRONTEND=noninteractive \
     PYTHONUNBUFFERED=1 \
     HF_HOME=/models/hf \
-    HF_HUB_ENABLE_HF_TRANSFER=1
+    HF_HUB_ENABLE_HF_TRANSFER=1 \
+    PIP_BREAK_SYSTEM_PACKAGES=1
 
 RUN apt-get update && apt-get install -y --no-install-recommends curl ca-certificates \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* \
+    && python -c "import sys, torch; print(sys.executable, 'torch', torch.__version__, 'cuda', torch.version.cuda)"
 
 RUN pip install --no-cache-dir "huggingface-hub==0.36.2" hf_transfer soundfile "fastapi==0.115.6" "uvicorn==0.32.1"
 
