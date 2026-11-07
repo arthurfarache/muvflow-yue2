@@ -28,16 +28,20 @@ def carregar():
     try:
         from huggingface_hub import snapshot_download
         t = time.time()
+        print(f"baixando pesos do YuE2...", flush=True)
         snapshot_download("m-a-p/YuE2-3B")
         snapshot_download("m-a-p/YuE2-Vae")
         estado["download_s"] = round(time.time() - t, 1)
+        print(f"pesos baixados em {estado['download_s']}s; carregando o modelo", flush=True)
         from yue2 import YuE2Pipeline
         t = time.time()
         pipe = YuE2Pipeline.from_pretrained("m-a-p/YuE2-3B", device="cuda", progress=False)
         estado["carga_s"] = round(time.time() - t, 1)
         estado["pronto"] = True
+        print(f"modelo carregado em {estado['carga_s']}s", flush=True)
     except Exception as e:  # sem modelo, o /health nunca passa e a Salad recria a instância
         estado["erro_carga"] = repr(e)[:500]
+        print("falha ao carregar: " + estado["erro_carga"], flush=True)
 
 
 threading.Thread(target=carregar, daemon=True).start()
